@@ -1,0 +1,17 @@
+{
+  "name": "Shri Ram Janki Seva Trust",
+  "short_name": "Ram Janki Trust",
+  "description": "Katha, yagya, pooja, seva and yatri niwas in Ayodhya Dham.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fffaf1",
+  "theme_color": "#4b0718",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "64x64",
+      "type": "image/svg+xml"
+    }
+  ]
+}
