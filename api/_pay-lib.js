@@ -1,3 +1,5 @@
+// ROOT PATH: api/_pay-lib.js
+import nodemailer from 'nodemailer';
 // api/_pay-lib.js  (underscore se shuru: Vercel me route nahi banta)
 // Payments: Supabase REST + Razorpay + Resend + invoice template
 import crypto from 'node:crypto';
@@ -95,8 +97,35 @@ export function verifyWebhookSignature(rawBody, signature) {
 
 // ---------- Email (Resend) ----------
 export async function sendMail({ to, subject, html, text, headers, replyTo, from: fromOverride }) {
+  // Option A (easiest, no domain needed): Gmail / any SMTP. Set SMTP_USER + SMTP_PASS (Gmail App Password).
+  if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+    const port = Number(process.env.SMTP_PORT || 465);
+    try {
+      const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST || 'smtp.gmail.com',
+        port,
+        secure: port === 465,
+        auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+        connectionTimeout: 10000,
+        socketTimeout: 15000,
+      });
+      const info = await transporter.sendMail({
+        from: process.env.SMTP_FROM || `"${HOTEL.nameEn}" <${process.env.SMTP_USER}>`,
+        to: Array.isArray(to) ? to.join(',') : to,
+        subject,
+        html,
+        text,
+        replyTo: replyTo || undefined,
+        ...(headers ? { headers } : {}),
+      });
+      return { ok: true, id: info.messageId };
+    } catch (e) {
+      return { ok: false, error: `SMTP error: ${e.message}` };
+    }
+  }
+  // Option B: Resend (needs a verified domain to email anyone except the Resend account owner).
   const key = process.env.RESEND_API_KEY;
-  if (!key) return { ok: false, error: 'RESEND_API_KEY set nahi hai' };
+  if (!key) return { ok: false, error: 'Email set nahi hai: SMTP_USER+SMTP_PASS ya RESEND_API_KEY chahiye' };
   if (!process.env.MAIL_FROM && process.env.VERCEL_ENV === 'production') {
     console.warn('MAIL_FROM set nahi hai: onboarding@resend.dev se bhej rahe hain. Domain verify karke MAIL_FROM set karein.');
   }
