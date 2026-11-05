@@ -1,3 +1,4 @@
+// ROOT PATH: src/pages/Home.tsx
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { CalendarCheck, Clock, FileText, HeartHandshake, MapPin, Phone, ShieldCheck, Sparkles } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
@@ -195,9 +196,9 @@ export function Home() {
               )}
             </div>
             <div className="mt-12 grid max-w-2xl grid-cols-3 gap-3">
-              {[['Katha & Pooja', `${SEVAS.length} sevas`], ['Seva Desk', settings.phone], ['Location', 'Ramghat']].map(([label, value]) => (
+              {[['Katha & Pooja', `${SEVAS.length} sevas`], ['Dham', 'Ayodhya'], ['Location', 'Ramghat']].map(([label, value]) => (
                 <div key={label} className="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur">
-                  <p className="font-serif text-xl font-bold text-[#f5d891] sm:text-2xl">{value}</p>
+                  <p className="break-words font-serif text-lg font-bold leading-tight text-[#f5d891] sm:text-2xl">{value}</p>
                   <p className="mt-1 text-xs uppercase tracking-wider text-white/60">{label}</p>
                 </div>
               ))}
