@@ -86,7 +86,7 @@ export function DonationSection({ settings }: { settings: Settings }) {
   ].filter(([, v]) => v.trim()) as [string, string][]
 
   return (
-    <section id="donate" className="bg-[#fff3d8] px-4 py-24 sm:px-6 lg:px-8">
+    <section id="donate" className="scroll-mt-16 bg-[#fff3d8] px-4 py-20 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         <div className="mx-auto mb-12 max-w-3xl text-center">
           <p className="text-sm font-bold uppercase tracking-[0.35em] text-[#b7812d]">Daan · Seva · Donation</p>
