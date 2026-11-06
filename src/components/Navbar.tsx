@@ -6,6 +6,8 @@ import { LogoMark } from './LogoMark'
 import type { Settings } from '../types'
 import { trackEvent } from '../lib/metaPixel'
 import { useAdminSession } from '../lib/useAdminSession'
+import { isSupabaseConfigured, supabase } from '../lib/supabase'
+import { storage } from '../lib/storage'
 
 const links = [
   { href: '/', label: 'Home' },
@@ -18,6 +20,12 @@ const links = [
 export function Navbar({ onBook, settings }: { onBook: () => void; settings: Settings }) {
   const [open, setOpen] = useState(false)
   const { isAdmin, newCount } = useAdminSession()
+  const logout = async () => {
+    if (isSupabaseConfigured) await supabase.auth.signOut()
+    localStorage.removeItem(storage.keys.authed)
+    setOpen(false)
+    window.location.href = '/'
+  }
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#2a0611]/80 backdrop-blur-xl" style={{ backgroundColor: `${settings.primaryColor}dd` }}>
@@ -40,11 +48,14 @@ export function Navbar({ onBook, settings }: { onBook: () => void; settings: Set
           <div className="hidden rounded-full border border-[#d7a84f]/25 bg-white/10 px-4 py-2 text-xs font-semibold text-[#f5d891] xl:block">
             <span className="inline-flex items-center gap-2"><Phone className="h-3.5 w-3.5" /> {settings.phone} / {settings.secondaryPhone}{settings.helpline ? ` • Helpline ${settings.helpline}` : ''}</span>
           </div>
-          {isAdmin && (
+          {isAdmin ? (
             <div className="flex items-center gap-2">
               <Link to="/admin" className="rounded-full border border-[#d7a84f]/60 px-4 py-2 text-sm font-bold text-[#f5d891] transition hover:bg-white/10">Admin</Link>
               {newCount > 0 && <Link to="/admin/inquiries" className="rounded-full bg-[#e53935] px-3 py-1.5 text-xs font-black text-white" aria-label={`${newCount} new inquiries`}>{newCount} new</Link>}
+              <button type="button" onClick={logout} className="rounded-full border border-white/25 px-4 py-2 text-sm font-bold text-white/85 transition hover:bg-white/10">Logout</button>
             </div>
+          ) : (
+            <Link to="/login" className="rounded-full border border-[#d7a84f]/60 px-4 py-2 text-sm font-bold text-[#f5d891] transition hover:bg-white/10">Login</Link>
           )}
           <button onClick={onBook} style={{ background: settings.accentColor, color: settings.primaryColor }} className="rounded-full px-5 py-2 text-sm font-bold shadow-lg shadow-[#d7a84f]/25 transition hover:scale-105">
             Book Stay
@@ -65,11 +76,14 @@ export function Navbar({ onBook, settings }: { onBook: () => void; settings: Set
             <a href={`tel:${settings.phone}`} onClick={() => trackEvent('Contact', { method: 'call' })} className="rounded-2xl border border-[#d7a84f]/25 bg-white/10 p-3 text-sm font-semibold text-[#f5d891]">
               Mobile: {settings.phone}, {settings.secondaryPhone}{settings.helpline && <><br />Helpline: {settings.helpline}</>}
             </a>
-            {isAdmin && (
+            {isAdmin ? (
               <div className="flex gap-2">
                 <Link to="/admin" onClick={() => setOpen(false)} className="flex-1 rounded-full border border-[#d7a84f]/60 px-5 py-3 text-center font-bold text-[#f5d891]">Admin</Link>
                 {newCount > 0 && <Link to="/admin/inquiries" onClick={() => setOpen(false)} className="rounded-full bg-[#e53935] px-5 py-3 text-center font-black text-white">{newCount} new</Link>}
+                <button type="button" onClick={logout} className="rounded-full border border-white/25 px-5 py-3 font-bold text-white/85">Logout</button>
               </div>
+            ) : (
+              <Link to="/login" onClick={() => setOpen(false)} className="rounded-full border border-[#d7a84f]/60 px-5 py-3 text-center font-bold text-[#f5d891]">Login</Link>
             )}
             <button onClick={() => { setOpen(false); onBook() }} style={{ background: settings.accentColor, color: settings.primaryColor }} className="rounded-full px-5 py-3 font-bold">
               Book Stay
