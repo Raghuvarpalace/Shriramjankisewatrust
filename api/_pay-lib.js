@@ -61,7 +61,7 @@ export async function requireAdmin(req) {
   const r = await fetch(`${supaBase()}/auth/v1/user`, { headers: { apikey: anon || '', Authorization: `Bearer ${jwt}` } });
   if (!r.ok) throw httpError(401, 'Session expire ho gaya, dobara login karo');
   const user = await r.json();
-  const allow = (process.env.ADMIN_EMAILS || '').split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
+  const allow = (process.env.ADMIN_EMAILS || 'vermajiayush@gmail.com,panditneerajtiwari@gmail.com').split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
   if (allow.length && !allow.includes(String(user.email || '').toLowerCase())) throw httpError(403, `Is account ko permission nahi hai (login email: ${user.email || 'unknown'}). Vercel me ADMIN_EMAILS me yahi email daalein (${allow.length} email set hain), phir Redeploy karein.`);
   return user;
 }
@@ -97,6 +97,8 @@ export function verifyWebhookSignature(rawBody, signature) {
 
 // ---------- Email (Resend) ----------
 export async function sendMail({ to, subject, html, text, headers, replyTo, from: fromOverride }) {
+  // accept 'a@x.com,b@y.com', ['a@x.com','b@y.com'] or a single address
+  to = (Array.isArray(to) ? to : String(to || '').split(',')).map((x) => String(x).trim()).filter(Boolean);
   // Option A (easiest, no domain needed): Gmail / any SMTP. Set SMTP_USER + SMTP_PASS (Gmail App Password).
   if (process.env.SMTP_USER && process.env.SMTP_PASS) {
     const port = Number(process.env.SMTP_PORT || 465);
@@ -111,7 +113,7 @@ export async function sendMail({ to, subject, html, text, headers, replyTo, from
       });
       const info = await transporter.sendMail({
         from: process.env.SMTP_FROM || `"${HOTEL.nameEn}" <${process.env.SMTP_USER}>`,
-        to: Array.isArray(to) ? to.join(',') : to,
+        to: to.join(','),
         subject,
         html,
         text,
@@ -130,11 +132,11 @@ export async function sendMail({ to, subject, html, text, headers, replyTo, from
     console.warn('MAIL_FROM set nahi hai: onboarding@resend.dev se bhej rahe hain. Domain verify karke MAIL_FROM set karein.');
   }
   const from = fromOverride || process.env.MAIL_FROM || `${HOTEL.nameEn} <onboarding@resend.dev>`;
-  const reply = replyTo || process.env.BOOKING_NOTIFY_EMAIL || 'panditneerajtiwari1@gmail.com';
+  const reply = replyTo || String(process.env.BOOKING_NOTIFY_EMAIL || 'panditneerajtiwari@gmail.com').split(',')[0].trim();
   const r = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ from, to: Array.isArray(to) ? to : [to], subject, html, text, reply_to: reply, ...(headers ? { headers } : {}) }),
+    body: JSON.stringify({ from, to, subject, html, text, reply_to: reply, ...(headers ? { headers } : {}) }),
     signal: AbortSignal.timeout(15000),
   });
   const j = await r.json().catch(() => ({}));
@@ -348,7 +350,7 @@ export async function emailInvoice(p, { force = false } = {}) {
     return sent;
   }
   if (force) await sb(`payment_requests?id=eq.${p.id}`, { method: 'PATCH', prefer: 'return=minimal', body: { invoice_emailed_at: new Date().toISOString() } });
-  const admin = process.env.BOOKING_NOTIFY_EMAIL || 'panditneerajtiwari1@gmail.com';
+  const admin = process.env.BOOKING_NOTIFY_EMAIL || 'vermajiayush@gmail.com,panditneerajtiwari@gmail.com';
   if (!force) await sendMail({ to: admin, ...adminAlertEmail(p) });
   return sent;
 }
