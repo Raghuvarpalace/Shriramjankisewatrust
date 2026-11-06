@@ -1,5 +1,5 @@
 // ROOT PATH: src/pages/Login.tsx
-import { FormEvent, useState } from 'react'
+import { FormEvent, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { LockKeyhole } from 'lucide-react'
 import { LogoMark } from '../components/LogoMark'
@@ -16,26 +16,33 @@ export function Login() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
+  useEffect(() => {
+    if (!isSupabaseConfigured) return
+    void supabase.auth.getSession().then(({ data }) => {
+      if (isAdminEmail(data.session?.user?.email)) navigate('/admin', { replace: true })
+    })
+  }, [navigate])
+
   const submit = async (event: FormEvent) => {
     event.preventDefault()
     setLoading(true)
     setError('')
 
-    if (!isAdminEmail(email)) {
+    if (!isAdminEmail(email.trim())) {
       setLoading(false)
       setError('Ye email admin ke liye allowed nahi hai. Customer ko login ki zaroorat nahi hoti.')
       return
     }
 
     if (isSupabaseConfigured) {
-      const { error: authError } = await supabase.auth.signInWithPassword({ email, password })
+      const { error: authError } = await supabase.auth.signInWithPassword({ email: email.trim().toLowerCase(), password })
       setLoading(false)
       if (!authError) {
         localStorage.setItem(storage.keys.authed, 'true')
         navigate('/admin')
         return
       }
-      setError(authError.message)
+      setError(authError.message === 'Invalid login credentials' ? 'Email ya password galat hai. Agar admin user abhi Supabase me bana nahi hai to pehle bana lein.' : authError.message)
       return
     }
 
@@ -52,9 +59,9 @@ export function Login() {
         </div>
         <form onSubmit={submit} className="mt-8 space-y-4">
           <label className="block text-sm font-semibold">Admin Email</label>
-          <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" className="admin-input bg-white text-[#4b0718]" />
+          <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" autoComplete="username" required className="admin-input bg-white text-[#4b0718]" />
           <label className="block text-sm font-semibold">Password</label>
-          <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" className="admin-input bg-white text-[#4b0718]" />
+          <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" autoComplete="current-password" required className="admin-input bg-white text-[#4b0718]" />
           {error && <p className="text-sm text-[#ffd0d0]">{error}</p>}
           <button className="flex w-full items-center justify-center gap-2 rounded-full bg-[#d7a84f] px-6 py-3 font-black text-[#4b0718]">
             <LockKeyhole className="h-5 w-5" /> {loading ? 'Authenticating...' : 'Login to Dashboard'}
@@ -63,4 +70,4 @@ export function Login() {
       </div>
     </main>
   )
-        }
+}
