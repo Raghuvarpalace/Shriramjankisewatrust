@@ -65,3 +65,54 @@ test('GET is refused and validation errors are 400', async () => {
     assert.equal(p.code, 400);
   } finally { globalThis.fetch = realFetch; }
 });
+
+test('room inquiry mail goes to BOTH admin emails, even if BOOKING_NOTIFY_EMAIL is something else', async () => {
+  const saved = { ...process.env };
+  process.env.SUPABASE_URL = 'http://supa.test';
+  process.env.SUPABASE_SERVICE_ROLE_KEY = 'svc';
+  process.env.RESEND_API_KEY = 're_test';
+  delete process.env.SMTP_USER; delete process.env.SMTP_PASS;
+  process.env.BOOKING_NOTIFY_EMAIL = 'other@example.com';
+  const realFetch = globalThis.fetch;
+  let mail = null;
+  globalThis.fetch = async (u, opts) => {
+    u = String(u);
+    if (u.includes('api.resend.com')) { mail = JSON.parse(opts.body); return { ok: true, status: 200, json: async () => ({ id: 'm1' }) }; }
+    if (u.includes('hit_rate_limit')) return { ok: true, status: 200, text: async () => 'true' };
+    return { ok: true, status: 201, text: async () => '' };
+  };
+  try {
+    const res = mockRes();
+    await handler({ method: 'POST', headers: {}, socket: {}, body: { kind: 'room', name: 'Ram Kumar', phone: '9454191686', room: 'A.C. Room', guests: '3' } }, res);
+    assert.equal(res.code, 200, JSON.stringify(res.body));
+    assert.ok(mail, 'mail was sent');
+    assert.ok(mail.to.includes('vermajiayush@gmail.com') && mail.to.includes('panditneerajtiwari@gmail.com') && mail.to.includes('other@example.com'));
+    assert.match(mail.subject, /Room booking inquiry/);
+  } finally { globalThis.fetch = realFetch; process.env = saved; }
+});
+
+test('if the database save fails the mail still goes out (success); if both fail it is an error', async () => {
+  const saved = { ...process.env };
+  process.env.SUPABASE_URL = 'http://supa.test';
+  process.env.SUPABASE_SERVICE_ROLE_KEY = 'svc';
+  process.env.RESEND_API_KEY = 're_test';
+  delete process.env.SMTP_USER; delete process.env.SMTP_PASS;
+  const realFetch = globalThis.fetch;
+  let mailOk = true;
+  globalThis.fetch = async (u) => {
+    u = String(u);
+    if (u.includes('api.resend.com')) return mailOk ? { ok: true, status: 200, json: async () => ({ id: 'm1' }) } : { ok: false, status: 500, json: async () => ({ message: 'down' }) };
+    if (u.includes('hit_rate_limit')) return { ok: true, status: 200, text: async () => 'true' };
+    return { ok: false, status: 500, text: async () => '{"message":"db down"}' };
+  };
+  const body = { kind: 'room', name: 'Sita Devi', phone: '9670000112', room: 'Non A.C. Room' };
+  try {
+    const a = mockRes();
+    await handler({ method: 'POST', headers: {}, socket: {}, body }, a);
+    assert.equal(a.code, 200);
+    mailOk = false;
+    const b = mockRes();
+    await handler({ method: 'POST', headers: {}, socket: {}, body: { ...body, phone: '9670000113' } }, b);
+    assert.equal(b.code, 500);
+  } finally { globalThis.fetch = realFetch; process.env = saved; }
+});
