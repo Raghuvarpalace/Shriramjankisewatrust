@@ -9,6 +9,7 @@ import { BookingsAdmin } from './pages/BookingsAdmin'
 import { InquiriesAdmin } from './pages/InquiriesAdmin'
 import { BookingStatus } from './pages/BookingStatus'
 import { Policy } from './pages/Policy'
+import { RequireAdmin } from './components/RequireAdmin'
 import { trackPageView } from './lib/metaPixel'
 
 // Fires a Meta Pixel PageView on first load and on every route change.
@@ -31,10 +32,10 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/admin/payments" element={<PaymentsAdmin />} />
-        <Route path="/admin/bookings" element={<BookingsAdmin />} />
-        <Route path="/admin/inquiries" element={<InquiriesAdmin />} />
+        <Route path="/admin" element={<RequireAdmin><Admin /></RequireAdmin>} />
+        <Route path="/admin/payments" element={<RequireAdmin><PaymentsAdmin /></RequireAdmin>} />
+        <Route path="/admin/bookings" element={<RequireAdmin><BookingsAdmin /></RequireAdmin>} />
+        <Route path="/admin/inquiries" element={<RequireAdmin><InquiriesAdmin /></RequireAdmin>} />
         <Route path="/pay/:token" element={<Pay />} />
         <Route path="/booking/:ref" element={<BookingStatus />} />
         <Route path="/privacy" element={<Policy kind="privacy" />} />
