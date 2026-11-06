@@ -1,3 +1,4 @@
+// ROOT PATH: src/components/Navbar.tsx
 import { Link, NavLink } from 'react-router-dom'
 import { Menu, Phone, X } from 'lucide-react'
 import { useState } from 'react'
@@ -7,9 +8,9 @@ import { trackEvent } from '../lib/metaPixel'
 
 const links = [
   { href: '/', label: 'Home' },
+  { href: '/#rooms', label: 'Rooms' },
   { href: '/#seva', label: 'Katha & Pooja' },
   { href: '/#donate', label: 'Donate' },
-  { href: '/#rooms', label: 'Yatri Niwas' },
   { href: '/#location', label: 'Location' },
 ]
 
