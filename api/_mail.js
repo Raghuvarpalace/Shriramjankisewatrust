@@ -58,7 +58,7 @@ export const fmtD = (ymd) =>
 export async function notifyAdmin(subject, detail) {
   console.error('ALERT:', subject, typeof detail === 'string' ? detail : JSON.stringify(detail));
   try {
-    const to = process.env.BOOKING_NOTIFY_EMAIL || 'panditneerajtiwari1@gmail.com';
+    const to = process.env.BOOKING_NOTIFY_EMAIL || 'vermajiayush@gmail.com,panditneerajtiwari@gmail.com';
     const body = typeof detail === 'string' ? detail : JSON.stringify(detail, null, 2);
     await sendMail({ to, subject: `[SST] ${subject}`, html: `<pre style="font-family:monospace;white-space:pre-wrap">${esc(body)}</pre>`, text: body });
   } catch (e) {
