@@ -9,11 +9,20 @@ import { BookingsAdmin } from './pages/BookingsAdmin'
 import { InquiriesAdmin } from './pages/InquiriesAdmin'
 import { BookingStatus } from './pages/BookingStatus'
 import { Policy } from './pages/Policy'
-import { RequireAdmin } from './components/RequireAdmin'
+import { Navigate } from 'react-router-dom'
+import { useAdminSession } from './lib/useAdminSession'
 import { trackPageView } from './lib/metaPixel'
 
 // Fires a Meta Pixel PageView on first load and on every route change.
 // Admin and login pages are skipped so staff visits don't pollute ad data.
+// Only a real Supabase session of an allowed admin email gets into /admin pages.
+function RequireAdmin({ children }: { children: React.ReactNode }) {
+  const { isAdmin, ready } = useAdminSession()
+  if (!ready) return <div className="grid min-h-screen place-items-center bg-[#2a0611] text-[#f5d891]">Loading...</div>
+  if (!isAdmin) return <Navigate to="/login" replace />
+  return <>{children}</>
+}
+
 function PixelRouteTracker() {
   const { pathname } = useLocation()
 
