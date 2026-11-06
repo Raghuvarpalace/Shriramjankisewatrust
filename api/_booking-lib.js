@@ -225,7 +225,7 @@ async function afterFinalize(r, pay) {
     const [p] = await sb(`booking_payments?gateway_order_id=eq.${q(pay.gateway_order_id)}&select=*`);
     if (b && p) {
       const alert = adminAlertEmail(bookingInvoiceShape(b, p));
-      await sendMail({ to: process.env.BOOKING_NOTIFY_EMAIL || 'panditneerajtiwari1@gmail.com', ...alert });
+      await sendMail({ to: process.env.BOOKING_NOTIFY_EMAIL || 'vermajiayush@gmail.com,panditneerajtiwari@gmail.com', ...alert });
     }
     return;
   }
