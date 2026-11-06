@@ -15,7 +15,7 @@ const ICONS: Record<SevaIcon, React.ElementType> = {
 
 export function SevaSection({ settings, onInquire }: { settings: Settings; onInquire: (seva: Seva) => void }) {
   return (
-    <section id="seva" className="bg-[#26040e] px-4 py-24 text-white sm:px-6 lg:px-8">
+    <section id="seva" className="scroll-mt-16 bg-[#26040e] px-4 py-20 text-white sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         <div className="mx-auto mb-12 max-w-3xl text-center">
           <p className="text-sm font-bold uppercase tracking-[0.35em] text-[#f5d891]">Katha · Pooja · Anushthan</p>
