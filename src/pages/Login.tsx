@@ -1,7 +1,9 @@
+// ROOT PATH: src/pages/Login.tsx
 import { FormEvent, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { LockKeyhole } from 'lucide-react'
 import { LogoMark } from '../components/LogoMark'
+import { isAdminEmail } from '../lib/adminEmails'
 import { storage } from '../lib/storage'
 import { isSupabaseConfigured, supabase } from '../lib/supabase'
 import { useNoIndex } from '../lib/useNoIndex'
@@ -18,6 +20,12 @@ export function Login() {
     event.preventDefault()
     setLoading(true)
     setError('')
+
+    if (!isAdminEmail(email)) {
+      setLoading(false)
+      setError('Ye email admin ke liye allowed nahi hai. Customer ko login ki zaroorat nahi hoti.')
+      return
+    }
 
     if (isSupabaseConfigured) {
       const { error: authError } = await supabase.auth.signInWithPassword({ email, password })
@@ -40,7 +48,7 @@ export function Login() {
       <div className="mx-auto max-w-md rounded-[2rem] border border-[#d7a84f]/25 bg-white/10 p-8 shadow-2xl backdrop-blur-xl">
         <LogoMark />
         <div className="mt-8 rounded-2xl bg-[#d7a84f]/10 p-4 text-sm text-[#f5d891]">
-          Secure admin access powered by Supabase Auth when VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are configured.
+          Trust admin login. Visitors and devotees do not need to log in to use the website.
         </div>
         <form onSubmit={submit} className="mt-8 space-y-4">
           <label className="block text-sm font-semibold">Admin Email</label>
