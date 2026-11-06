@@ -34,7 +34,7 @@ export const HOTEL_NAME_HI = 'श्री राम जानकी सेव�
 export const HOTEL_ADDRESS = 'Luvkushnagar, Ramghat (near Shyama Sadan), Ayodhya Dham, Uttar Pradesh 224123'
 export const HOTEL_PHONES = ['9454191686', '9670000112']
 export const HOTEL_HELPLINE = ''
-export const HOTEL_EMAIL = 'panditneerajtiwari1@gmail.com'
+export const HOTEL_EMAIL = 'panditneerajtiwari@gmail.com'
 
 export const CONSENT_TEXT: string = policy.marketingConsentText
 export const REFUND_PROCESSING_DAYS: string = policy.refundProcessingDays
