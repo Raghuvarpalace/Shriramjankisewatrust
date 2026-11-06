@@ -3,7 +3,6 @@ import type { Room } from '../types'
 import { isTestModeOnly, onlinePaymentsEnabled } from '../lib/hotel'
 
 export function RoomCard({ room, onPay, onBook, whatsapp, phone }: { room: Room; onPay: (room: Room) => void; onBook: (roomName: string) => void; whatsapp: string; phone: string }) {
-  const soldOut = room.available <= 0
   const payOn = onlinePaymentsEnabled()
   const wa = `https://wa.me/91${whatsapp.replace(/\D/g, '').slice(-10)}?text=${encodeURIComponent(`Namaste, mujhe ${room.name} ke baare me jaankari chahiye.`)}`
   return (
@@ -36,7 +35,7 @@ export function RoomCard({ room, onPay, onBook, whatsapp, phone }: { room: Room;
           <div className="rounded-2xl bg-[#fff8eb] p-3 text-[#4b0718]"><Layers className="mx-auto mb-1 h-5 w-5 text-[#b7812d]" />{room.floor}</div>
           <div className="rounded-2xl bg-[#fff8eb] p-3 text-[#4b0718]"><Bath className="mx-auto mb-1 h-5 w-5 text-[#b7812d]" />{room.bathType}</div>
         </div>
-        <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-[#4b0718]/5 px-3 py-2 text-xs font-bold text-[#4b0718]"><Check className="h-4 w-4 text-[#b7812d]" /> {soldOut ? 'Currently sold out' : room.available <= 3 ? `Only ${room.available} left` : 'Available for booking'}</div>
+        <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-[#4b0718]/5 px-3 py-2 text-xs font-bold text-[#4b0718]"><Check className="h-4 w-4 text-[#b7812d]" /> {room.available > 0 && room.available <= 3 ? `Only ${room.available} left` : 'Book now · seva desk availability confirm karega'}</div>
         <div className="mt-5 flex flex-wrap gap-2">
           {room.amenities.map((item) => (
             <span key={item} className="rounded-full border border-[#d7a84f]/25 px-3 py-1 text-xs font-semibold text-[#4b0718]">{item}</span>
@@ -51,10 +50,9 @@ export function RoomCard({ room, onPay, onBook, whatsapp, phone }: { room: Room;
           <button
             type="button"
             onClick={() => (payOn ? onPay(room) : onBook(room.name))}
-            disabled={soldOut}
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-[#4b0718] px-5 py-3.5 font-bold text-white shadow-lg shadow-[#4b0718]/20 transition hover:bg-[#7d1128] disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-[#4b0718] px-5 py-3.5 font-bold text-white shadow-lg shadow-[#4b0718]/20 transition hover:bg-[#7d1128]"
           >
-            {payOn && <Lock className="h-4 w-4 text-[#f5d891]" />} {soldOut ? 'Sold out' : payOn ? 'Book & Pay' : 'Book Now'}
+            {payOn && <Lock className="h-4 w-4 text-[#f5d891]" />} {payOn ? 'Book & Pay' : 'Book Now'}
           </button>
           <a
             href={wa}
