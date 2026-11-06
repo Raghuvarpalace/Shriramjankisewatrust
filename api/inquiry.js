@@ -6,7 +6,7 @@ import { sb, httpError, esc, sendMail, HOTEL, siteUrl } from './_pay-lib.js';
 import { readBody, clientIp, rateLimit, normPhone, isIndianMobile, isYmd } from './_booking-lib.js';
 
 const KINDS = ['seva', 'donation', 'room'];
-const NOTIFY_FALLBACK = 'panditneerajtiwari1@gmail.com';
+const NOTIFY_FALLBACK = 'vermajiayush@gmail.com,panditneerajtiwari@gmail.com';
 
 const clean = (v, max) => String(v ?? '').replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, max);
 const newRef = () => `RJ-${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
@@ -91,7 +91,7 @@ export default async function handler(req, res) {
     await sb('inquiries', { method: 'POST', body: row, prefer: 'return=minimal' });
 
     try {
-      const to = process.env.BOOKING_NOTIFY_EMAIL || NOTIFY_FALLBACK;
+      const to = (process.env.BOOKING_NOTIFY_EMAIL || NOTIFY_FALLBACK).split(',').map((x) => x.trim()).filter(Boolean);
       const { text, html } = mailBody(row);
       const r = await sendMail({ to, subject: `[${row.ref}] ${KIND_LABEL[row.kind]} - ${row.name}`, html, text });
       if (!r.ok) console.warn('inquiry mail not sent:', r.error);
