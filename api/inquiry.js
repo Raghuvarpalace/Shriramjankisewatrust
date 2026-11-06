@@ -6,7 +6,8 @@ import { sb, httpError, esc, sendMail, HOTEL, siteUrl } from './_pay-lib.js';
 import { readBody, clientIp, rateLimit, normPhone, isIndianMobile, isYmd } from './_booking-lib.js';
 
 const KINDS = ['seva', 'donation', 'room'];
-const NOTIFY_FALLBACK = 'vermajiayush@gmail.com,panditneerajtiwari@gmail.com';
+const ADMIN_NOTIFY = ['vermajiayush@gmail.com', 'panditneerajtiwari@gmail.com'];
+export const notifyList = () => [...new Set([...ADMIN_NOTIFY, ...String(process.env.BOOKING_NOTIFY_EMAIL || '').split(',').map((x) => x.trim().toLowerCase()).filter(Boolean)])];
 
 const clean = (v, max) => String(v ?? '').replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, max);
 const newRef = () => `RJ-${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
@@ -88,16 +89,30 @@ export default async function handler(req, res) {
     await rateLimit(`inq:phone:${row.phone}`, 6, 3600, { failOpen: true });
 
     row.ref = newRef();
-    await sb('inquiries', { method: 'POST', body: row, prefer: 'return=minimal' });
 
+    // 1) Save in the database. If this fails we still try the email below, so the enquiry is not lost.
+    let saved = true;
     try {
-      const to = (process.env.BOOKING_NOTIFY_EMAIL || NOTIFY_FALLBACK).split(',').map((x) => x.trim()).filter(Boolean);
+      await sb('inquiries', { method: 'POST', body: row, prefer: 'return=minimal' });
+    } catch (e) {
+      saved = false;
+      console.error('inquiry save failed:', e.message);
+    }
+
+    // 2) Email BOTH admins. Always includes the two default addresses; BOOKING_NOTIFY_EMAIL only adds more.
+    let mailed = false;
+    try {
+      const to = notifyList();
       const { text, html } = mailBody(row);
       const r = await sendMail({ to, subject: `[${row.ref}] ${KIND_LABEL[row.kind]} - ${row.name}`, html, text });
-      if (!r.ok) console.warn('inquiry mail not sent:', r.error);
+      mailed = Boolean(r.ok);
+      if (!r.ok) console.error('inquiry mail not sent:', r.error);
     } catch (e) {
-      console.warn('inquiry mail failed:', e.message);
+      console.error('inquiry mail failed:', e.message);
     }
+
+    // Only fail if the enquiry reached neither the database nor the inbox.
+    if (!saved && !mailed) throw httpError(500, 'Request save nahi ho payi');
     return res.status(200).json({ success: true, ref: row.ref });
   } catch (e) {
     const status = e.status || 500;
