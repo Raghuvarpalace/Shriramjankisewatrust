@@ -15,7 +15,6 @@ import { BookPayModal } from '../components/BookPayModal'
 import { RoomCard } from '../components/RoomCard'
 import { TestimonialWidget } from '../components/TestimonialWidget'
 import { VideoPopup } from '../components/VideoPopup'
-import { SEVAS } from '../data/sevas'
 import { submitInquiry } from '../lib/inquiry'
 import { storage } from '../lib/storage'
 import { trackEvent } from '../lib/metaPixel'
@@ -148,7 +147,7 @@ export function Home() {
       <Navbar onBook={() => openBooking()} settings={settings} />
       {promoVideo && <VideoPopup youtubeUrl={promoVideo.youtubeUrl} videoSrc={promoVideo.src} poster={promoVideo.poster} temples={temples} source={promoVideo.popupSource || 'storage'} trigger={promoTrigger} />}
       <main>
-      <section className="relative flex min-h-screen items-center overflow-hidden bg-[#2a0611] px-4 pt-24 text-white sm:px-6 lg:px-8">
+      <section className="relative flex min-h-[88svh] items-center overflow-hidden bg-[#2a0611] px-4 pb-16 pt-28 text-white sm:px-6 lg:min-h-screen lg:px-8">
         <motion.div style={{ y: heroY, scale: heroScale }} className="absolute inset-0">
           <img
             src={settings.heroImage}
@@ -165,52 +164,111 @@ export function Home() {
         <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
           <motion.div initial={{ opacity: 0, y: 35 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
             <div className="inline-flex items-center gap-2 rounded-full border border-[#d7a84f]/40 bg-white/10 px-4 py-2 text-sm text-[#f5d891] backdrop-blur">
-              <Sparkles className="h-4 w-4" /> Seva · Katha · Yatri Niwas in {settings.location}
+              <Sparkles className="h-4 w-4" /> Yatri Niwas · Ramghat, {settings.location}
             </div>
-            <h1 className="mt-8 font-serif text-5xl font-black leading-tight md:text-7xl">
-              श्री राम जानकी <span className="text-[#f5d891]">सेवा ट्रस्ट</span>
+            <h1 className="mt-6 font-serif text-4xl font-black leading-tight sm:text-5xl md:text-6xl">
+              यात्रियों के ठहरने की <span className="text-[#f5d891]">उत्तम व्यवस्था</span>
             </h1>
-            <p className="mt-3 font-serif text-2xl text-[#f5d891]/90">Shri Ram Janki Seva Trust · Ayodhya Dham</p>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-white/78">
-              Shrimad Bhagwat Katha, Ram Katha, Yagya anushthan and pooja, with comfortable stay for yatris at Luvkushnagar, Ramghat, Ayodhya Dham{settings.maharajName ? ` — under the guidance of ${settings.maharajName}` : ''}.
+            <p className="mt-3 font-serif text-xl text-[#f5d891]/90 sm:text-2xl">श्री राम जानकी सेवा ट्रस्ट · Shri Ram Janki Seva Trust</p>
+            <p className="mt-5 max-w-2xl text-base leading-7 text-white/80 sm:text-lg sm:leading-8">
+              A.C., Non-A.C. rooms and group stay for pilgrims at Luvkushnagar, Ramghat, Ayodhya Dham. Katha, pooja and anushthan are also arranged{settings.maharajName ? ` under ${settings.maharajName}` : ''}.
             </p>
             <div className="mt-5 flex flex-wrap gap-2">
-              {['भागवत कथा', 'राम कथा', 'यज्ञ अनुष्ठान', 'पूजा', 'यात्री निवास'].map((item) => (
+              {['A.C. Rooms', 'Non-A.C. Rooms', 'Group Stay', 'Katha & Pooja'].map((item) => (
                 <span key={item} className="rounded-full border border-[#d7a84f]/35 bg-[#2a0611]/45 px-4 py-2 text-sm font-bold text-[#f5d891] backdrop-blur">{item}</span>
               ))}
             </div>
-            <div className="mt-9 flex flex-col flex-wrap gap-4 sm:flex-row">
-              <a href="#seva" className="rounded-full bg-gradient-to-r from-[#d7a84f] to-[#fff0ad] px-8 py-4 text-center font-black text-[#4b0718] shadow-2xl shadow-[#d7a84f]/30 transition hover:scale-105">
-                Katha / Pooja Inquiry
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <a href="#rooms" className="rounded-full bg-gradient-to-r from-[#d7a84f] to-[#fff0ad] px-8 py-4 text-center font-black text-[#4b0718] shadow-2xl shadow-[#d7a84f]/30 transition hover:scale-105">
+                View Rooms &amp; Book
               </a>
-              <a href="#donate" className="rounded-full border border-white/25 bg-white/10 px-8 py-4 text-center font-bold text-white backdrop-blur transition hover:bg-white/20">
-                Donate / दान करें
+              <a href={`tel:${settings.phone}`} onClick={() => trackEvent('Contact', { content_name: 'Hero Call' })} className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 bg-white/10 px-8 py-4 text-center font-bold text-white backdrop-blur transition hover:bg-white/20">
+                <Phone className="h-4 w-4" /> Call Now
               </a>
-              <button onClick={() => openBooking()} className="rounded-full border border-[#d7a84f]/45 bg-[#2a0611]/55 px-8 py-4 text-center font-bold text-[#f5d891] backdrop-blur transition hover:bg-[#2a0611]/80">
-                Book Stay
-              </button>
+              <a href={`https://wa.me/91${settings.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent('Jai Shri Ram, mujhe Yatri Niwas ke baare me jaankari chahiye.')}`} target="_blank" rel="noreferrer" onClick={() => trackEvent('Contact', { content_name: 'Hero WhatsApp' })} className="rounded-full border border-[#d7a84f]/45 bg-[#2a0611]/55 px-8 py-4 text-center font-bold text-[#f5d891] backdrop-blur transition hover:bg-[#2a0611]/80">
+                WhatsApp
+              </a>
               {promoVideo && (
                 <button onClick={() => setPromoTrigger((value) => value + 1)} className="rounded-full border border-white/25 px-8 py-4 text-center font-bold text-white/85 backdrop-blur transition hover:bg-white/10">
                   Watch Video
                 </button>
               )}
             </div>
-            <div className="mt-12 grid max-w-2xl grid-cols-3 gap-3">
-              {[['Katha & Pooja', `${SEVAS.length} sevas`], ['Dham', 'Ayodhya'], ['Location', 'Ramghat']].map(([label, value]) => (
-                <div key={label} className="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur">
-                  <p className="break-words font-serif text-lg font-bold leading-tight text-[#f5d891] sm:text-2xl">{value}</p>
+            <p className="mt-5 text-sm text-white/70">
+              Also: <a href="#seva" className="font-semibold text-[#f5d891] underline underline-offset-4">Katha &amp; Pooja</a> · <a href="#donate" className="font-semibold text-[#f5d891] underline underline-offset-4">Donate / दान करें</a>
+            </p>
+            <div className="mt-8 grid max-w-2xl grid-cols-3 gap-3">
+              {[['Stay', 'A.C. / Non-A.C.'], ['Location', 'Ramghat'], ['Seva', 'Katha · Pooja']].map(([label, value]) => (
+                <div key={label} className="rounded-2xl border border-white/10 bg-white/10 p-3 backdrop-blur sm:p-4">
+                  <p className="break-words font-serif text-base font-bold leading-tight text-[#f5d891] sm:text-xl">{value}</p>
                   <p className="mt-1 text-xs uppercase tracking-wider text-white/60">{label}</p>
                 </div>
               ))}
             </div>
           </motion.div>
-          <motion.div initial={{ opacity: 0, x: 35 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.9, delay: 0.15 }} className="rounded-[2rem] border border-[#d7a84f]/30 bg-white/10 p-4 backdrop-blur-xl">
+          <motion.div initial={{ opacity: 0, x: 35 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.9, delay: 0.15 }} className="hidden rounded-[2rem] border border-[#d7a84f]/30 bg-white/10 p-4 backdrop-blur lg:block">
             <img src={settings.heroCardImage} alt="Shri Ram Janki Seva Trust, Ayodhya Dham" decoding="async" className="h-[520px] w-full rounded-[1.5rem] object-cover" />
           </motion.div>
         </div>
+        <a href="#rooms" aria-label="Scroll to rooms" className="absolute bottom-5 left-1/2 z-10 -translate-x-1/2 animate-bounce text-sm font-bold text-[#f5d891]/90">Rooms ↓</a>
       </section>
 
-            <section id="story" className="px-4 py-24 sm:px-6 lg:px-8">
+      <section id="rooms" className="scroll-mt-16 px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+        <SectionTitle eyebrow="Yatri Niwas · Rooms" title="Choose your room" text="A.C. rooms, Non-A.C. rooms and group stay for yatris. Tap Book Now to send a request, or call the seva desk for tariff and availability." />
+        <div className="mx-auto mb-8 flex max-w-5xl flex-wrap justify-center gap-3">
+          {['A.C. Rooms', 'Non-A.C. Rooms', 'Group Stay'].map((item) => (
+            <span key={item} className="rounded-full bg-[#4b0718] px-5 py-3 text-sm font-black text-[#f5d891] shadow-lg shadow-[#4b0718]/15">{item}</span>
+          ))}
+        </div>
+        <div className="mx-auto mb-10 grid max-w-7xl gap-4 rounded-[2rem] border border-[#d7a84f]/25 bg-white p-5 shadow-xl shadow-[#4b0718]/10 md:grid-cols-3">
+          <div className="flex items-center gap-3"><Clock className="h-8 w-8 text-[#b7812d]" /><div><p className="font-bold text-[#4b0718]">Check-In / Check-Out</p><p className="text-sm text-[#6b5560]">{settings.checkIn} / {settings.checkOut}</p></div></div>
+          <div className="flex items-center gap-3"><ShieldCheck className="h-8 w-8 text-[#b7812d]" /><div><p className="font-bold text-[#4b0718]">Seva Desk</p><p className="text-sm text-[#6b5560]">{settings.phone}, {settings.secondaryPhone}</p></div></div>
+          <div className="flex items-center gap-3"><MapPin className="h-8 w-8 text-[#b7812d]" /><div><p className="font-bold text-[#4b0718]">Location</p><p className="text-sm text-[#6b5560]">Luvkushnagar, Ramghat, Ayodhya</p></div></div>
+        </div>
+        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-3">
+          {rooms.map((room) => <RoomCard key={room.id} room={room} onPay={setPayRoom} onBook={openBooking} whatsapp={settings.whatsapp} phone={settings.phone} />)}
+        </div>
+      </section>
+
+      <section id="booking" className="scroll-mt-16 border-t border-[#d7a84f]/25 bg-[#fff3d8] px-4 py-16 text-[#4b0718] sm:px-6 sm:py-20 lg:px-8">
+        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.9fr_1.1fr]">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-[0.35em] text-[#b7812d]">Yatri Niwas</p>
+            <h2 className="mt-3 font-serif text-5xl font-bold">Request a stay.</h2>
+            <p className="mt-5 leading-8 text-[#6b5560]">Send your stay request to the trust. The seva desk will check availability and contact you.</p>
+            <div className="mt-8 space-y-3 text-[#4b0718]/85">
+              <p className="flex items-center gap-3"><Phone className="h-5 w-5 text-[#b7812d]" /> {settings.phone}, {settings.secondaryPhone}{settings.helpline ? ` • Helpline ${settings.helpline}` : ''}</p>
+              <p className="flex items-center gap-3"><MapPin className="h-5 w-5 text-[#b7812d]" /> {settings.address}</p>
+            </div>
+            <a href="#seva" className="mt-8 inline-flex items-center gap-2 rounded-full border border-[#4b0718]/25 bg-white/70 px-5 py-3 text-sm font-bold text-[#4b0718] transition hover:bg-white">Planning a katha or pooja too? See Katha &amp; Pooja ↓</a>
+          </div>
+          <form onSubmit={createBooking} className={`rounded-[2rem] border border-[#d7a84f]/25 bg-white p-6 text-[#4b0718] shadow-2xl ${bookingOpen ? 'ring-4 ring-[#d7a84f]/40' : ''}`}>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <input value={guestName} onChange={(e) => setGuestName(e.target.value)} required placeholder="Guest name" className="admin-input" autoComplete="name" />
+              <input value={phone} onChange={(e) => setPhone(e.target.value)} required inputMode="numeric" placeholder="Mobile number" className="admin-input" autoComplete="tel" />
+              <select value={selectedRoom || rooms[0]?.name || ''} onChange={(e) => setSelectedRoom(e.target.value)} className="admin-input">
+                {rooms.map((room) => <option key={room.id} value={room.name}>{room.name}</option>)}
+              </select>
+              <input value={checkIn} onChange={(e) => setCheckIn(e.target.value)} type="date" aria-label="Arrival date" className="admin-input" />
+              <input value={guests} onChange={(e) => setGuests(e.target.value)} placeholder="Guests" className="admin-input sm:col-span-2" />
+            </div>
+            <input value={bookingTrap} onChange={(e) => setBookingTrap(e.target.value)} tabIndex={-1} autoComplete="off" aria-hidden="true" className="absolute left-[-9999px] h-0 w-0 opacity-0" name="website" />
+            {bookingMsg && <p role="status" className="mt-4 rounded-xl bg-[#fff8eb] p-3 text-sm font-semibold text-[#4b0718]">{bookingMsg}</p>}
+            <button disabled={bookingBusy} className="mt-6 w-full rounded-full bg-[#d7a84f] px-6 py-4 font-black text-[#4b0718] disabled:opacity-60">{bookingBusy ? 'Sending...' : 'Send Stay Request'}</button>
+          </form>
+        </div>
+      </section>
+
+      <SevaSection settings={settings} onInquire={(seva) => setSevaModal(seva.title)} />
+      <div className="bg-gradient-to-r from-[#4b0718] via-[#6b0f24] to-[#4b0718] px-4 py-8 text-center text-white sm:px-6">
+        <p className="font-serif text-xl font-bold text-[#f5d891] sm:text-2xl">सेवा में सहभागी बनें — Be a part of the seva</p>
+        <p className="mx-auto mt-2 max-w-2xl text-sm text-white/75">Your donation supports katha, yagya, pooja and yatri seva at the trust.</p>
+        <a href="#donate" className="mt-4 inline-flex rounded-full bg-[#d7a84f] px-7 py-3 text-sm font-black text-[#4b0718] shadow-lg transition hover:scale-105">Donate / दान करें ↓</a>
+      </div>
+
+      <DonationSection settings={settings} />
+
+      <section id="story" className="px-4 py-24 sm:px-6 lg:px-8">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.9fr_1.1fr]">
           <div className="relative">
             <img src={settings.storyImage} alt="Shri Ram Janki Seva Trust, Ayodhya Dham" loading="lazy" decoding="async" className="h-full min-h-[520px] rounded-[2rem] object-cover shadow-2xl" />
@@ -235,37 +293,6 @@ export function Home() {
               ))}
             </div>
           </div>
-        </div>
-      </section>
-
-      <SevaSection settings={settings} onInquire={(seva) => setSevaModal(seva.title)} />
-
-      {videos.length > 0 && (
-      <section id="video" className="bg-[#26040e] px-4 py-24 text-white sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-10 max-w-3xl">
-            <p className="text-sm font-bold uppercase tracking-[0.35em] text-[#f5d891]">Videos</p>
-            <h2 className="mt-3 font-serif text-4xl font-bold md:text-5xl">Katha, darshan and trust moments.</h2>
-          </div>
-          <OTTPlayer videos={publicVideos.length ? publicVideos : videos} />
-        </div>
-      </section>
-      )}
-
-      <section id="rooms" className="px-4 py-24 sm:px-6 lg:px-8">
-        <SectionTitle eyebrow="Yatri Niwas" title="Comfortable stay for pilgrims and katha parties" text="Rooms and group accommodation for yatris visiting Ayodhya Dham. Send an inquiry or call the seva desk for availability and tariff." />
-        <div className="mx-auto mb-8 flex max-w-5xl flex-wrap justify-center gap-3">
-          {['A.C. Rooms', 'Non-A.C. Rooms', 'Group Stay'].map((item) => (
-            <span key={item} className="rounded-full bg-[#4b0718] px-5 py-3 text-sm font-black text-[#f5d891] shadow-lg shadow-[#4b0718]/15">{item}</span>
-          ))}
-        </div>
-        <div className="mx-auto mb-10 grid max-w-7xl gap-4 rounded-[2rem] border border-[#d7a84f]/25 bg-white p-5 shadow-xl shadow-[#4b0718]/10 md:grid-cols-3">
-          <div className="flex items-center gap-3"><Clock className="h-8 w-8 text-[#b7812d]" /><div><p className="font-bold text-[#4b0718]">Check-In / Check-Out</p><p className="text-sm text-[#6b5560]">{settings.checkIn} / {settings.checkOut}</p></div></div>
-          <div className="flex items-center gap-3"><ShieldCheck className="h-8 w-8 text-[#b7812d]" /><div><p className="font-bold text-[#4b0718]">Seva Desk</p><p className="text-sm text-[#6b5560]">{settings.phone}, {settings.secondaryPhone}</p></div></div>
-          <div className="flex items-center gap-3"><MapPin className="h-8 w-8 text-[#b7812d]" /><div><p className="font-bold text-[#4b0718]">Location</p><p className="text-sm text-[#6b5560]">Luvkushnagar, Ramghat, Ayodhya</p></div></div>
-        </div>
-        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-3">
-          {rooms.map((room) => <RoomCard key={room.id} room={room} onPay={setPayRoom} onBook={openBooking} whatsapp={settings.whatsapp} phone={settings.phone} />)}
         </div>
       </section>
 
@@ -303,7 +330,17 @@ export function Home() {
 
       <LocalServices services={services} settings={settings} />
 
-      <DonationSection settings={settings} />
+      {videos.length > 0 && (
+      <section id="video" className="bg-[#26040e] px-4 py-24 text-white sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-10 max-w-3xl">
+            <p className="text-sm font-bold uppercase tracking-[0.35em] text-[#f5d891]">Videos</p>
+            <h2 className="mt-3 font-serif text-4xl font-bold md:text-5xl">Katha, darshan and trust moments.</h2>
+          </div>
+          <OTTPlayer videos={publicVideos.length ? publicVideos : videos} />
+        </div>
+      </section>
+      )}
 
       {reviews.length > 0 && (
       <section className="px-4 py-24 sm:px-6 lg:px-8">
@@ -313,34 +350,6 @@ export function Home() {
         </div>
       </section>
       )}
-
-      <section id="booking" className="bg-[#2a0611] px-4 py-24 text-white sm:px-6 lg:px-8">
-        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.9fr_1.1fr]">
-          <div>
-            <p className="text-sm font-bold uppercase tracking-[0.35em] text-[#f5d891]">Yatri Niwas</p>
-            <h2 className="mt-3 font-serif text-5xl font-bold">Request a stay.</h2>
-            <p className="mt-5 leading-8 text-white/70">Send your stay request to the trust. The seva desk will check availability and contact you.</p>
-            <div className="mt-8 space-y-3 text-white/75">
-              <p className="flex items-center gap-3"><Phone className="h-5 w-5 text-[#f5d891]" /> {settings.phone}, {settings.secondaryPhone}{settings.helpline ? ` • Helpline ${settings.helpline}` : ''}</p>
-              <p className="flex items-center gap-3"><MapPin className="h-5 w-5 text-[#f5d891]" /> {settings.address}</p>
-            </div>
-          </div>
-          <form onSubmit={createBooking} className={`rounded-[2rem] border border-[#d7a84f]/25 bg-white p-6 text-[#4b0718] shadow-2xl ${bookingOpen ? 'ring-4 ring-[#d7a84f]/40' : ''}`}>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <input value={guestName} onChange={(e) => setGuestName(e.target.value)} required placeholder="Guest name" className="admin-input" autoComplete="name" />
-              <input value={phone} onChange={(e) => setPhone(e.target.value)} required inputMode="numeric" placeholder="Mobile number" className="admin-input" autoComplete="tel" />
-              <select value={selectedRoom || rooms[0]?.name || ''} onChange={(e) => setSelectedRoom(e.target.value)} className="admin-input">
-                {rooms.map((room) => <option key={room.id} value={room.name}>{room.name}</option>)}
-              </select>
-              <input value={checkIn} onChange={(e) => setCheckIn(e.target.value)} type="date" aria-label="Arrival date" className="admin-input" />
-              <input value={guests} onChange={(e) => setGuests(e.target.value)} placeholder="Guests" className="admin-input sm:col-span-2" />
-            </div>
-            <input value={bookingTrap} onChange={(e) => setBookingTrap(e.target.value)} tabIndex={-1} autoComplete="off" aria-hidden="true" className="absolute left-[-9999px] h-0 w-0 opacity-0" name="website" />
-            {bookingMsg && <p role="status" className="mt-4 rounded-xl bg-[#fff8eb] p-3 text-sm font-semibold text-[#4b0718]">{bookingMsg}</p>}
-            <button disabled={bookingBusy} className="mt-6 w-full rounded-full bg-[#d7a84f] px-6 py-4 font-black text-[#4b0718] disabled:opacity-60">{bookingBusy ? 'Sending...' : 'Send Stay Request'}</button>
-          </form>
-        </div>
-      </section>
 
       <section id="policies" className="px-4 py-24 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
