@@ -155,7 +155,7 @@ export function Admin() {
   if (!isAuthed) return <Navigate to="/login" replace />
 
   return (
-    <main className="min-h-screen bg-[#fffaf1] pb-24 lg:pb-8">
+    <main className="min-h-screen bg-[#fffaf1] pb-56 lg:pb-8">
       <header className="sticky top-0 z-40 border-b border-[#d7a84f]/20 bg-[#2a0611]/95 px-4 py-4 text-white backdrop-blur sm:px-6 lg:px-8">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
           <div>
@@ -163,7 +163,7 @@ export function Admin() {
             <h1 className="font-serif text-2xl font-bold">Trust Admin Dashboard</h1>
             <p className="mt-1 text-xs text-white/55 lg:hidden">Mobile app style dashboard • {tabs.find((tab) => tab.id === activeTab)?.label}</p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap justify-end gap-2 sm:gap-3">
             <a href="/admin/inquiries" className="flex items-center gap-2 rounded-full border border-[#d7a84f]/60 px-4 py-3 font-bold text-[#f5d891] sm:px-5">Inquiries</a>
             <a href="/admin/bookings" className="flex items-center gap-2 rounded-full border border-[#d7a84f]/60 px-4 py-3 font-bold text-[#f5d891] sm:px-5">Bookings</a>
             <a href="/admin/payments" className="flex items-center gap-2 rounded-full border border-[#d7a84f]/60 px-4 py-3 font-bold text-[#f5d891] sm:px-5">Payments</a>
@@ -434,6 +434,7 @@ export function Admin() {
           </div>
         </section>}
       </div>
+      <button onClick={persistAll} className="fixed bottom-40 right-4 z-50 flex items-center gap-2 rounded-full bg-[#d7a84f] px-6 py-4 text-base font-black text-[#4b0718] shadow-2xl shadow-black/40 lg:hidden"><Save className="h-5 w-5" /> Save</button>
       <nav className="fixed inset-x-3 bottom-3 z-50 grid grid-cols-6 gap-1 rounded-[1.5rem] border border-[#d7a84f]/25 bg-[#2a0611]/95 p-2 shadow-2xl backdrop-blur-xl lg:hidden">
         {tabs.map((tab) => {
           const Icon = tab.icon
