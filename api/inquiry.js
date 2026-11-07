@@ -67,12 +67,13 @@ function mailBody(row) {
     row.preferred_date && ['Preferred date', row.preferred_date],
     row.city && ['City / place', row.city],
     row.message && ['Message', row.message],
+    ['Received', new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) + ' IST'],
   ].filter(Boolean);
   const text = [`${KIND_LABEL[row.kind]} - ${HOTEL.nameEn}`, '', ...lines.map(([k, v]) => `${k}: ${v}`), '', `Admin: ${siteUrl()}/admin/inquiries`].join('\n');
   const html = `<div style="font-family:Arial,sans-serif;font-size:15px;color:#3b2a30">
 <h2 style="color:#4b0718;margin:0 0 12px">${esc(KIND_LABEL[row.kind])}</h2>
 <table cellpadding="6" style="border-collapse:collapse">${lines.map(([k, v]) => `<tr><td style="color:#7a6a70">${esc(k)}</td><td><b>${esc(v)}</b></td></tr>`).join('')}</table>
-<p style="margin-top:16px"><a href="${esc(siteUrl())}/admin/inquiries">Open inquiries in admin</a></p></div>`;
+<p style="margin-top:16px"><a href="tel:+91${esc(row.phone)}">Call ${esc(row.phone)}</a> &nbsp;|&nbsp; <a href="https://wa.me/91${esc(row.phone)}">WhatsApp</a> &nbsp;|&nbsp; <a href="${esc(siteUrl())}/admin/inquiries">Open inquiries in admin</a></p></div>`;
   return { text, html };
 }
 
