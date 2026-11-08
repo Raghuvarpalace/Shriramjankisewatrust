@@ -1,4 +1,5 @@
 // ROOT PATH: src/pages/Home.tsx
+import { resolveMap } from '../lib/maps'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { CalendarCheck, Clock, FileText, HeartHandshake, MapPin, Phone, ShieldCheck, Sparkles } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
@@ -312,13 +313,13 @@ export function Home() {
           <div className="overflow-hidden rounded-[2rem] border border-[#d7a84f]/25 shadow-2xl shadow-[#4b0718]/10">
             <iframe
               title="Google Maps - Shri Ram Janki Seva Trust, Ayodhya"
-              src={`https://www.google.com/maps?q=${encodeURIComponent(settings.mapQuery)}&output=embed`}
+              src={resolveMap(settings.mapQuery, settings.address).embed}
               className="h-[560px] w-full"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
             />
             <div className="bg-[#4b0718] p-4 text-center">
-              <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(settings.mapQuery)}`} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center rounded-full bg-[#d7a84f] px-6 py-3 font-black text-[#4b0718]">
+              <a href={resolveMap(settings.mapQuery, settings.address).open} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center rounded-full bg-[#d7a84f] px-6 py-3 font-black text-[#4b0718]">
                 Get Direction on Google Maps
               </a>
             </div>
