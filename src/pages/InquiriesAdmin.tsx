@@ -28,6 +28,7 @@ export function InquiriesAdmin() {
   const [status, setStatus] = useState('open')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [mailMsg, setMailMsg] = useState('')
 
   const load = useCallback(async () => {
     if (!isSupabaseConfigured) {
@@ -58,6 +59,18 @@ export function InquiriesAdmin() {
   )
   const donationTotal = useMemo(() => rows.filter((r) => r.kind === 'donation' && r.status !== 'spam').reduce((sum, r) => sum + (r.amount_inr || 0), 0), [rows])
 
+  const testMail = async () => {
+    setMailMsg('Test mail bhej rahe hain...')
+    try {
+      const { data } = await supabase.auth.getSession()
+      const r = await fetch('/api/inquiry?test=mail', { headers: { Authorization: `Bearer ${data.session?.access_token || ''}` } })
+      const j = await r.json()
+      setMailMsg(j.success ? `Mail gaya (${j.mode}) -> ${(j.to || []).join(', ')}. Inbox aur Spam dekhein.` : `Mail NAHI gaya (${j.mode || 'setup'}): ${j.error || 'unknown error'}`)
+    } catch (e) {
+      setMailMsg(`Test fail: ${(e as Error).message}`)
+    }
+  }
+
   if (!isAuthed) return <Navigate to="/login" replace />
 
   return (
@@ -70,12 +83,14 @@ export function InquiriesAdmin() {
           </div>
           <div className="flex gap-2">
             <button type="button" onClick={() => { setLoading(true); void load() }} className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-sm font-bold"><RefreshCw className="h-4 w-4" /> Refresh</button>
+            <button type="button" onClick={() => { void testMail() }} className="inline-flex items-center gap-2 rounded-full border border-[#d7a84f]/60 px-4 py-2 text-sm font-bold text-[#f5d891]">Test mail</button>
             <a href="/admin" className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-sm font-bold"><ArrowLeft className="h-4 w-4" /> Dashboard</a>
           </div>
         </div>
       </header>
 
       <div className="mx-auto max-w-5xl space-y-5 px-4 py-6 sm:px-6 lg:px-8">
+        {mailMsg && <div role="status" className="rounded-2xl bg-[#fff3d8] p-3 text-sm font-semibold text-[#5b3a00]">{mailMsg}</div>}
         {error && <div role="alert" className="rounded-2xl bg-[#fde8e8] p-3 text-sm font-semibold text-[#9b1c1c]">{error}</div>}
         <div className="grid grid-cols-3 gap-3 text-center">
           <div className="rounded-2xl border border-[#d7a84f]/25 bg-white p-4"><p className="font-serif text-3xl font-bold text-[#4b0718]">{rows.filter((r) => r.status === 'new').length}</p><p className="text-xs uppercase tracking-wider text-[#6b5560]">New</p></div>
