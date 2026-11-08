@@ -2,7 +2,7 @@
 // POST /api/inquiry  { kind: 'seva' | 'donation' | 'room', name, phone, ... }
 // 1) validates, 2) saves to public.inquiries (never lost), 3) emails the trust (best effort).
 import crypto from 'node:crypto';
-import { sb, httpError, esc, sendMail, HOTEL, siteUrl } from './_pay-lib.js';
+import { sb, httpError, esc, sendMail, HOTEL, siteUrl, requireAdmin } from './_pay-lib.js';
 import { readBody, clientIp, rateLimit, normPhone, isIndianMobile, isYmd } from './_booking-lib.js';
 
 const KINDS = ['seva', 'donation', 'room'];
@@ -79,6 +79,14 @@ function mailBody(row) {
 
 export default async function handler(req, res) {
   try {
+    // Admin-only mail check: GET /api/inquiry?test=mail  (button on /admin/inquiries). Returns the real error.
+    if (req.method === 'GET' && req.query?.test === 'mail') {
+      await requireAdmin(req);
+      const mode = process.env.SMTP_USER && process.env.SMTP_PASS ? 'Gmail SMTP' : process.env.RESEND_API_KEY ? 'Resend' : 'none';
+      const to = notifyList();
+      const r = await sendMail({ to, subject: `Test mail - ${HOTEL.nameEn}`, text: 'Ye test mail hai. Agar ye aapko mila to inquiry alerts bhi aayenge.', html: '<p>Ye test mail hai. Agar ye aapko mila to inquiry alerts bhi aayenge.</p>' });
+      return res.status(200).json({ success: Boolean(r.ok), mode, to, error: r.ok ? undefined : r.error });
+    }
     if (req.method !== 'POST') throw httpError(405, 'Sirf POST allowed hai');
     const body = readBody(req);
     // Honeypot: bots fill hidden "website" field. Pretend success, store nothing.
