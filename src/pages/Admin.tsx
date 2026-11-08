@@ -1,3 +1,4 @@
+import { resolveMap } from '../lib/maps'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { BarChart3, Eye, EyeOff, Film, Hotel, ImagePlus, Landmark, LogOut, Palette, Save, Settings as SettingsIcon, Trash2, Upload, Users, Utensils } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
@@ -216,12 +217,17 @@ export function Admin() {
             <div className="admin-heading"><SettingsIcon /> General Settings</div>
             <div className="mt-5 space-y-4">
               {([
-                ['trustName', 'Trust Name'], ['location', 'Location'], ['phone', 'Primary Mobile'], ['secondaryPhone', 'Secondary Mobile'], ['helpline', 'Helpline'], ['email', 'Email'], ['whatsapp', 'WhatsApp Number'], ['address', 'Address'], ['logoText', 'Logo Text'], ['upiId', 'UPI ID (donation)'], ['maharajName', 'Maharaj / Contact Person'], ['registrationNo', 'Trust Registration No. (shown publicly)'], ['panNo', 'Trust PAN (shown publicly)'], ['taxNote', 'Tax note e.g. 80G details (shown publicly)'], ['bankAccountName', 'Bank: Account Name'], ['bankName', 'Bank: Name'], ['bankAccountNo', 'Bank: Account Number'], ['bankIfsc', 'Bank: IFSC'], ['bankBranch', 'Bank: Branch'], ['checkIn', 'Check-In Time'], ['checkOut', 'Check-Out Time'], ['mapQuery', 'Google Maps Query'], ['paymentQr', 'Payment QR Image Path'], ['appInstallQr', 'Install App QR Image Path'], ['checkinQr', 'Check-in QR Image Path'], ['roomServiceQr', 'Room Service QR Image Path'], ['logoUrl', 'Logo Image URL'], ['heroImage', 'Hero Background Image URL'], ['heroCardImage', 'Hero Room Card Image URL'], ['storyImage', 'Story Section Image URL'],
+                ['trustName', 'Trust Name'], ['location', 'Location'], ['phone', 'Primary Mobile'], ['secondaryPhone', 'Secondary Mobile'], ['helpline', 'Helpline'], ['email', 'Email'], ['whatsapp', 'WhatsApp Number'], ['address', 'Address'], ['logoText', 'Logo Text'], ['upiId', 'UPI ID (donation)'], ['maharajName', 'Maharaj / Contact Person'], ['registrationNo', 'Trust Registration No. (shown publicly)'], ['panNo', 'Trust PAN (shown publicly)'], ['taxNote', 'Tax note e.g. 80G details (shown publicly)'], ['bankAccountName', 'Bank: Account Name'], ['bankName', 'Bank: Name'], ['bankAccountNo', 'Bank: Account Number'], ['bankIfsc', 'Bank: IFSC'], ['bankBranch', 'Bank: Branch'], ['checkIn', 'Check-In Time'], ['checkOut', 'Check-Out Time'], ['paymentQr', 'Payment QR Image Path'], ['appInstallQr', 'Install App QR Image Path'], ['checkinQr', 'Check-in QR Image Path'], ['roomServiceQr', 'Room Service QR Image Path'], ['logoUrl', 'Logo Image URL'], ['heroImage', 'Hero Background Image URL'], ['heroCardImage', 'Hero Room Card Image URL'], ['storyImage', 'Story Section Image URL'],
               ] as [keyof Settings, string][]).map(([key, label]) => (
                 <label key={key} className="block text-sm font-semibold text-[#4b0718]">{label}
                   <input value={String(settings[key])} onChange={(e) => setSettings({ ...settings, [key]: e.target.value })} className="admin-input mt-2" />
                 </label>
               ))}
+              <label className="block text-sm font-semibold text-[#4b0718]">Google Maps Location
+                <input value={settings.mapQuery} onChange={(e) => setSettings({ ...settings, mapQuery: e.target.value })} className="admin-input mt-2" placeholder="Google Maps ka link, ya 26.7995,82.2047, ya jagah ka naam" />
+                <span className="mt-1 block text-xs font-normal text-[#6b5560]">Google Maps me jagah kholo, Share dabao, link yahan paste karo (ya latitude,longitude). Phir upar Save dabao.</span>
+                <a href={resolveMap(settings.mapQuery, settings.address).open} target="_blank" rel="noreferrer" className="mt-1 inline-block text-xs font-bold text-[#b7812d] underline">Test: Google Maps me kholkar dekho</a>
+              </label>
               <label className="block text-sm font-semibold text-[#4b0718]">Show Logo
                 <select value={settings.showLogo ? 'yes' : 'no'} onChange={(e) => setSettings({ ...settings, showLogo: e.target.value === 'yes' })} className="admin-input mt-2">
                   <option value="yes">Show logo</option>
