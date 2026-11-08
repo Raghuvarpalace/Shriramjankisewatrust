@@ -1,4 +1,5 @@
 // ROOT PATH: src/pages/BookingStatus.tsx
+import { resolveMap } from '../lib/maps'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { CalendarPlus, CheckCircle2, Clock3, FileText, Loader2, MapPin, MessageCircle, Phone, RefreshCw, XCircle } from 'lucide-react'
@@ -107,7 +108,7 @@ export function BookingStatus() {
   }
 
   const wa = `https://wa.me/91${settings.whatsapp.replace(/\D/g, '').slice(-10)}?text=${encodeURIComponent(`Namaste, meri booking ${ref} ke baare me jaankari chahiye.`)}`
-  const maps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(settings.mapQuery)}`
+  const maps = resolveMap(settings.mapQuery, settings.address).open
   const pending = b?.status === 'pending'
   const confirmed = b && ['confirmed', 'completed'].includes(b.status)
   const failed = pending && b?.payment?.status === 'failed'
